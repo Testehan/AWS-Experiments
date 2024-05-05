@@ -326,7 +326,113 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
     new EC2 instances are created.
     - these new instances are added to the Target Group that is configured for the Load Balancer..
 
-TODO Continu with 08 S3
+
+==============================================================================================================
+08 S3
+
+    - "infinitely scaling storage"
+    - for example when you do an EBS snapshot, this is stored on S3
+
+    Use cases
+        - backup and storage
+        - disaster recovery
+        - archive
+        - application and media storing
+        - data lakes and big data analytics
+        - software delivery
+        - static website
+
+    - allows users to store objects (files) into buckets (directories)
+    - buckets must have a globally unique name, across all regions and accounts !!!!
+    - buckets are defined at region level
+    - naming convention for buckets
+        - no uppercase
+        - no underscore
+        - 3-63 chars long
+        - not ip
+        - should start with lowecare or number
+
+    - objects have a key.. an Amazon S3 object key acts like a unique identifier within a specific S3 bucket
+        ex : for s3://my-bucket/my_file.txt the key is my_file.txt
+                 s3://my-bucket/randomDirectory/my_file.txt the key is randomDirectory/my_file.txt
+                 in this case the "randomDirectory" is called prefix
+
+    - you can also add metadata (list of key-value pairs)
+    - you can also add tag, (unicode key/value pair...up to 10..) useful for security and lifecycle
+    - you can also have version id
+
+    S3 Security
+        - 1. IAM policies - which API calls should be allowed for a specific user from IAM console
+        - 2. bucket policies - bucket wide rules from S3 console - allows cross account ...JSON based look similar to IAM policies
+            - they specify the resources (buckets and objects and the set of API to allow or deny), the actions (set of
+            API to allow or deny), the effect (allow or deny) and the principal (user or account to which the policy applies)
+        - 3. Object Access Control List (ACL) - finer grain
+        - 4. encryption - encrypt objects in S3 using encryption keys
+
+    S3 Versioning
+        - it is enabled at bucket level
+        - same key overwrite will increment the version : 1, 2, 3 ...
+        - it is a best practice to version your buckets:
+            - protects against unwanted deletes
+            - easy to roll back to previous version
+        - suspending versioning does not delete old versions
+
+    S3 Access logs
+        - for audit purposes, you may want to log access to S3 buckets
+        - any request, made to S3, FROM any account, authorized or unauthorized, will be logged into another S3 bucket
+        - those logs can be analyzed with an analysis tool
+        Dan: the logs will appear in the logs bucket after about an hour...so with delay...TODO See if logs were generated
+
+    S3 Replication
+        - 2 types, CRR (cross regional replication) and SRR (same region replication)
+        - in order for this to work, you must enable versioning both in the source and the destination bucket
+        - the copy process happens behind the scenes, and is asynchronous
+        - we must give proper IAM permission to S3
+
+    S3 Durability and Availability
+        - durability : if you store 10 mil objects in S3, you can expect to lose 1 object once every 10.000 years; durability
+        is the same for all storage classes (see below)
+        - availability : how readily available a service is; this depends on the storage class...for example S3 standard has
+        99.99% availability, which means not available 53 minutes per year
+
+    S3 storage classes
+        - S3 standard general purpose
+            - 99.99% availability
+        - S3 STANDARD infrequent access
+            - lower cost than S3 standard..usecase would be backups / disaster recovery
+            - 99.9% availability
+        - S3 one zone infrequent access
+            - high durability in one availability zone, but data is lost if availability zone is destroyed
+            - uses cases would be secondary backups of on premise data, or data that you can recreate
+        - S3 glacier instant retrieval
+            - low cost object storage used for archive / backup             (applies to all glacier)
+            - price is per storage + retrieval cost                          (applies to all glacier)
+            - milliseccond retrieval
+            - usecase...great for data that is accessed once per quarter for example
+        - S3 glacier flexible retrieval
+            - various longer retrieval times offered
+        - S3 glacier deep archive
+            - long storage.. lowest cost ....retrieval is in 12 hours +
+        - S3 intelligent tiering
+            - moves objects between tiers based on usage...for this extra functionality you pay a small fee, however
+            there are no retrieval charges in S3 intelligent tiering
+
+        Dan: when you upload a file you can specify the Storage Class..default one is Standard...also you can move objects
+        to different classes depinding on needs
+
+    S3 encryption
+        - server side encryption means that the server, S3 in this case, encrypts the file after recieving it.
+        - client side encryption means that the file is encrypted before uploading it
+
+    AWS snow family
+        - highly secure, portable devices, to collect and process data at the edge and migrate data into our out of AWS
+        - this service is useful when dealing with a lot of data, since upload times over the internet can take too much
+         time when dealing with TBs or PBs of data ...even exabytes EB (1 EB = 100O PB = 1_000_000 TB )
+
+    AWS storage gateway
+        - is a bridge between on premise data and cloud data in S3
+
+TODO Continu with 09 Databases & Analytics
 
 TODO Whenever you run into a problem with the course, maybe you can try and look over the videos of this other course:
     https://www.youtube.com/watch?v=bO25vbkoJlA&list=PL7iMyoQPMtAN4xl6oWzafqJebfay7K8KP
