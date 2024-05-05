@@ -1,0 +1,385 @@
+https://www.udemy.com/course/practice-exams-aws-certified-cloud-practitioner/?couponCode=APR_24_GET_STARTED
+    For exam practice
+        (ALSO each chapter has questions html page at the end..)
+
+==============================================================================================================
+03 What is Cloud Computing?
+
+    Examples of cloud computing types:
+        - IaaS -> Amazon EC2, GCP, Digital Ocean
+        - PaaS -> Elastic Bean Stack(AWS), Google App Engine
+        - SaaS -> Rekognition for Machine learning on AWS, Dropbox, Zoom
+
+    An AWS Region is a cluster of data centers
+    A region has between 2 and 6 availability zones...each availability zone has redundant power, networking and
+    connectivity..so they are isolated from disasters.
+
+    AWS points of presence (edge locations) - these make content to be delivered to customers with lower latency
+
+    Some services, like Route 53, IAM are Global...while other are regional (like EC2).
+    NOT all AWS services are available in all the regions. You can see on their website if a specific service is available
+    or not for a specific region.
+
+!!!    Shared responsibility model
+        This means that you as a developer are responsible for the security IN the cloud (customer data, app security,
+        OS, firewall config, server side encryption etc) while AWS is responsible for the security OF the cloud...(the
+        hardware, infrastructure, physical security)
+            TODO Dan: question about this come in the exam
+
+
+==============================================================================================================
+04 IAM - Identity and Access Management
+
+    We already used IAM when we created the root account. (also when I created accounts for the shopping app)
+
+    Root account should not be used or shared...just to create other users
+
+    Users can be grouped in a Group.
+    Groups can only contain Users, not other Groups.
+    A User can belong to multiple Groups
+
+    Users and Groups can have json documents assigned which are called Policies
+
+!!!!In AWS you apply the least privileged principle: don't give more permissions than the user needs.
+
+    DanCurs     user created
+
+    A Policy is a json document, that contains a version, and one or more Statements.
+    The Statement element has several important parts:
+        - effect : whether the Statement allows or denies access
+        - principal : user/account/role for which the Statement applies
+        - action : list of actions that are being allowed or denied
+        - resource : list of resources to which the actions are applied
+
+    Users on AWS console should use MFA (multi factor authentication)
+
+    3 ways to connect to AWS:
+        - AWS web console                       (protected by password and MFA)
+        - AWS CLI (command line interface)      (PROTECTED by keys)
+        - AWS SDK                               (PROTECTED by keys)
+
+    Acess keys are generated from the AWS console.
+
+    Installed AWS CLI on the machine :)
+        "The AWS CLI first checks environment variables for credentials. If you've set the AWS_ACCESS_KEY_ID and
+        AWS_SECRET_ACCESS_KEY environment variables, those will be used for authentication. You can check your
+        system's environment variables to see if they're set."
+            Dan: because i used this setup, when i worked in the past on the shop app, for uploading S3 pictures,
+            now when i follow the tutorial, i created an AWS CLI profile, called "dancurs"..which needs to be specified
+            each time i run an AWS CLI command, otherwise it will use the env variable key, which only has S3 permissions
+
+    Example:
+        aws iam list-users --profile dancurs
+
+    An alternative to AWS CLI is AWS cloud shell.
+        "AWS CloudShell is a browser-based shell that gives you command-line access to your AWS resources in the
+        selected AWS region. AWS CloudShell comes pre-installed with popular tools for resource management and creation.
+        You have the same credentials as you used to log in to the console"
+
+        So since you are logged in the web console, no need to hassle with generating keys etc
+    Example:
+         aws iam list-users
+
+    AWS Cloud shell offers space as well...so if you create files there etc...they will be "persisted"
+        "Storage included 1 GB of storage free per AWS region"
+
+    Some AWS services will need to perform actions on your behalf. To do so, we will assign permissions to AWS Services,
+    with IAM Roles.
+        Example if you start an EC2 instance (virtual server) and you want this to access some AWS service, like listing users,
+        then you need to assign a role to EC2. They are also often used with Lambda.
+
+    Auditing ..If you select a user and go to  the Access Advisor tab, you can see what AWS Services he accessed and when.
+    This tool is very useful as if you notice that a user does not use some services, you can remove access for those services, and
+    thus minimize the no of operations that he can perform.
+    Similarly there is a Credentials Report, that lists all IAM users in your account, shows the status of access keys
+    for each user, including:
+    Access Key ID: The unique identifier for the access key. Status: Indicates whether the access key is active or inactive.
+    Last Used Date: The date and time when the access key was last used for an API call (if applicable).
+
+
+==============================================================================================================
+05 EC2 - Elastic Compute Cloud
+
+    This is Infrastructure as a service offering from Amazon
+    It mainly consists of:
+        - Renting Virtual Machines (EC2)
+        - Storing data on virtual drives (EBS)
+        - Distributing Load across Machines (ELB)
+
+    Sizing and configuration options :
+        - operating system : linux, windows, macos
+        - CPU
+        - RAM
+        - storage :
+            - network attached (EBS)
+            - hardware (ECS instance store)
+        - network card
+        - firewall rules
+        - bootstrap script, configure at first launch
+
+    Bootstrap script allows you to                  (this script runs with root acess)
+        - install updates
+        - install software
+        - download files from the internet
+        - anything else you might think about
+
+            Example used in the course:  (this will launch a webserver and write a html file to it)
+#!/bin/bash
+# Use this for your user data (script from top to bottom)
+# install httpd (Linux 2 version)
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+
+!!!!!
+    In order to make the EC2 accessible via ssh and from the outside world, check out the youtube tutorial from the end
+    (" AWS how to setup VPC, Public, Private Subnet, NAT, Internet Gateway, Route Table?")
+    and the diagram "AWS VPC Subnet InternetGateway RouteTable.png" to better understand the networking elements.
+
+    EC2 instance types
+    https://aws.amazon.com/ec2/instance-types/
+        General Purpose
+            General purpose instances provide a balance of compute, memory and networking resources, and can be used
+            for a variety of diverse workloads. These instances are ideal for applications that use these resources in
+            equal proportions such as web servers and code repositories.
+            Applications built on open-source software such as application servers, microservices, gaming servers,
+            midsize data stores, and caching fleets.
+
+        Compute Optimized
+            Compute Optimized instances are ideal for compute bound applications that benefit from high performance
+            processors. Instances belonging to this category are well suited for batch processing workloads, media
+            transcoding, high performance web servers, high performance computing (HPC), scientific modeling, dedicated
+            gaming servers and ad server engines, machine learning inference and other compute intensive applications.
+
+        Memory Optimized
+            Memory optimized instances are designed to deliver fast performance for workloads that process large data
+            sets in memory.
+
+        Accelerated Computing
+            Accelerated computing instances use hardware accelerators, or co-processors, to perform functions, such as
+            floating point number calculations, graphics processing, or data pattern matching, more efficiently than
+            is possible in software running on CPUs.
+
+        Storage Optimized
+            Storage optimized instances are designed for workloads that require high, sequential read and write access
+            to very large data sets on local storage. They are optimized to deliver tens of thousands of low-latency,
+            random I/O operations per second (IOPS) to applications.
+                Usecases:
+                    SQL and NoSQL dbs
+                    cache for in memory DB like Redis
+                    data warehouse apps
+                    distributed file systems
+
+        HPC Optimized
+            High performance computing (HPC) instances are purpose built to offer the best price performance for running
+            HPC workloads at scale on AWS. HPC instances are ideal for applications that benefit from high-performance
+            processors such as large, complex simulations and deep learning workloads.
+
+    Security groups
+        - are the fundamental of network security in AWS
+        - they control how traffic is allowed into or out of our EC2 instances
+        - security groups only contain allow rules !!!!!
+
+        - they act as a firewall on our EC2 instances
+        - one security group can be attached to multiple EC2 instances, and one EC2 instance can also have multiple
+        security groups
+        - all inbound traffic is BLOCKED by default
+        - all outbound traffic is ALLOWED by default
+
+        Dan: see "05- security groups diagram.png"
+
+    Classic ports to know
+        - 22 = SSH (secure shell) - log into linux instance
+        - 21 = FTP - upload files
+        - 22 = SFTP (secure file transfer protocol) - upload files using SSH
+        - 80 = HTTP - access unsecure websites
+        - 443 = HTTPS - access secure websites
+        - 3389 = RDP (remote desktop protocol) - log into a Windows instance
+
+        http://13.60.59.239/
+
+    SSH to EC2 instance
+        ssh -i EC2-Tutorial.pem ec2-user@ec2-13-60-59-239.eu-north-1.compute.amazonaws.com
+            - you need to run this command from the secrets folder where the EC2-Tutorial.pem file contains a private key,
+            that was either generated or selected during instance creation
+            - ec2-user is  user created for linux that is running on the instance
+
+        sudo -s (to become root)
+
+!!! You should assign a role to the EC2 instance, by selecting the instance and going to Actions -> Security -> Modify IAM role.
+    After doing the above step if you look into the EC2 instance settings ,in the Security tab you should see the IAM role.
+    If you assign a role like "DemoRoleForEC2" that has "IAMReadOnlyAccess" permission, then in the ssh console you can
+    run something like
+        "aws iam list-users"
+
+!!! Which purchasing option is better for me ?      (using a resort as an analogy for EC2)
+        - On demand : coming and staying in a resort, whenever we like, we pay the full price.
+        - Reserved : like planning ahead, and if we plan to stay for a long time (1-3 years), we may get a good discount
+        - Savings plan : pay a certain amount per hour for certain period and stay in any room type(eg King Suite, Sea View)
+        - Spot instances: the hotel allows people to bid for the empty rooms and the highest bidder keeps the rooms. You can
+            get kicked out at any time. (so this is for jobs/processes that can handle being killed any time)
+        - Dedicated hosts: we book an entire building of the resort
+        - capacity reservations : you book a room for a period with full price, even if you do not stay in it
+
+        Dan: see "5-2 price comparison.png"
+
+
+==============================================================================================================
+06 EC2 Instance Storage
+
+    EBS Volume
+     - means "elastic block store" is a network drive that you can attach to your instances while they run
+     - allows you to persist instance data, even after their termination; this means that one can terminante an instance
+     and after some time start a new instance, with the same EBS volume and have access to the same data that the previous
+     EC2 instance had
+     - an EBS can be mounted only for one EC2 instance at a time; however one EC2 instance can have multiple EBS volumes
+     - they are bound to availability zones
+     - think of them as a network USB stick !!!
+     - the connection between EBS and EC2 is via a network which means that latency can occur
+!!!  - when you create an EBS it has a flag "Delete on termination" ...which if set to true, when the EC2 is terminated,
+        will be deleted
+      - EBS snapshots are a backup of of your EBS volume at a moment in time
+      - you can copy EBS snapshots across availability zones or regions
+      - EBS snapshot archive is a storage that is 75% cheaper...but this means that it will take betweem 24 an 72 hours to
+      retrieve that archive...so cheaper means slower :)
+      - there is also a Recycle Bin feature for which you can set up rules as in how many days to keep there a delete snapshot,
+      this is obviously useful in cases of accidental deletion
+
+    AMI
+        - amazon machine image
+        - customization of an EC2 instance...you add your own software, configuration, operating system etc
+        - this provides faster boot time because all your software is pre-packaged
+        - are built for a specific region, and then they can be copied across regions
+        - we can make and maintain our own AMI; you would create an EC2 instance, customize it how you want, then when
+        ready, you stop it to maintain data integrity. Then you can build the AMI (this will also create EBS snapshots) and
+        finally you can use that custom AMI
+        - or you can buy AMIs from the marketplace
+
+    EC2 image builder
+        - used to automate the creation of Virtual machines or container images
+        => automate the creation, maintain, validate and test EC2 AMIs
+        - can be run on a schedule
+        - the output of a builder can be an AMI or a Docker image
+            Dan: mi-a dat eroare cand am urmat pasiii...aparent instanta de EC2 care ar fi trebuit sa ruleze procesul de
+            creare al imaginii avea probleme...pe care nu am mai stat sa le identific..
+        - cu DanPipe2 am reusit sa fac AMI... practic am lasat default la un pasul unde e "Create infrastructure
+        configuration using service defaults" ...asta foloseste un EC2 instance care costa bani ...insa ideea e sa opresc
+        EC2 dupa ce termina de creat imaginea
+
+    EC2 Instance store
+        - if you need high performance hard disk you must use EC2 instance store
+        - better I/O performance
+        - EC2 instance store lose their storage data if they are stopped...so this is suited for buffer / cache/ temporary
+        data
+        - for long term storage EBS is the choice
+
+    EFS - Elastic file system
+        - this is a managed NFS (network file system) that can be mounted on 100s of EC2 instances at a time, even if
+        these EC2s are located in multiple availability zones
+        - works with linux instances
+        - a variant of this is EFS Infrequent Access (EFS-IA) , which is a storage class that is optimized for files not accessed
+        every day (up to 92% lower costs)
+        - EFS can be configured to automatically move files to EFS-IA after a certain period of time since they were last
+        accessed
+
+    Amazon FSx
+        - use 3rd party high performance file systems on AWS (in case you do not like the offered storage options from
+        AWS...or you want to store some data on your servers instead of Amazons for various reasons)
+        -  Amazon FSx for windows file server
+        -  Amazon FSx for Lustre (name is derived from "Linux" and "cluster")
+
+
+==============================================================================================================
+07 ELB & ASG - Elastic Load Balancing & Auto Scaling Groups
+
+    - Vertical scalability means increasing the size of the instance...imagine a call center...and a Junior employee,
+    vertical scaling would mean to replace him with a senior employee when there are too many calls
+        so go from t3.micro to t3.large instance
+    - there is a limit on how much you can scale this way : the hardware
+
+    - Horizontal scalability ...means increasing the number of instances ...so in the call center example, this means
+    adding more employees based on demand
+
+    - High availability goes hand in hand with Horizontal scalability...and it means that your system runs in at least
+    2 availability zones...in the call center example it means to have a call center in New York and another one in London
+
+    - a load balancer is a server that forwards internet traffic to multiple servers (EC2 instances). By using one you can
+    expose a single point of access (DNS) for your application
+    - the load balancer will not direct traffic to a failling instance, because it performs regular health checks
+    - you can use a load balancer across multiple availability zones
+
+    - ELB (Elastic Load Balancer) is a managed load balancer...AWS guarantees that it will be working and takes care of
+    upgrades, maintenance etc
+    - AWS offers 3 kinds of ELBs:
+        1. application load balancer (HTTP/HTTPS only)
+        2. network load balancer (allows TCP...maybe for gaming, offer higher performance)
+        3. classic load balancer (this offering is being retired by Amazon)
+
+    Dan: see "AWS Load Balancer to 2 EC2 instances .png" to understand the elements needed to be configured for a load
+        balancer...there is a youtube video about this below as well..
+
+    - Auto Scaling groups are collections of Amazon EC2 instances that enable automatic scaling and fleet
+    management features. These features help you maintain the health and availability of your applications.
+    - you can choose various metrics, like CPU usage, and once the running EC2 instances reach that CPU usage threshold,
+    new EC2 instances are created.
+    - these new instances are added to the Target Group that is configured for the Load Balancer..
+
+TODO Continu with 08 S3
+
+TODO Whenever you run into a problem with the course, maybe you can try and look over the videos of this other course:
+    https://www.youtube.com/watch?v=bO25vbkoJlA&list=PL7iMyoQPMtAN4xl6oWzafqJebfay7K8KP
+
+
+!!!  Dan: very good explanation of network settings needed in AWS. This fixed my issues with connecting to the EC2 inbound
+        and outboud
+            see "AWS VPC Subnet InternetGateway RouteTable.png"
+    AWS how to setup VPC, Public, Private Subnet, NAT, Internet Gateway, Route Table?
+        https://www.youtube.com/watch?v=43tIX7901Gs
+
+    AWS ALB (Application Load Balancer) - Step By Step Tutorial (Part -9)               !!!! very good stuff
+        https://www.youtube.com/watch?v=cuJTmBvFCS0
+
+https://stackoverflow.com/questions/10253484/cant-access-site-on-ec2-instance-via-public-ip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
