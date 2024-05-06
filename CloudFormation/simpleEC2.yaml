@@ -1,0 +1,11 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: eu-north-1
+      ImageId: ami-0abb03f8142ebd755 # Replace with the desired AMI ID
+      InstanceType: t3.micro  # You can choose a different instance type
+      #Tags:
+      #  - InstanceName: DanInstanceFromCloudFormationScript
