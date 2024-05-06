@@ -381,7 +381,7 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
         - for audit purposes, you may want to log access to S3 buckets
         - any request, made to S3, FROM any account, authorized or unauthorized, will be logged into another S3 bucket
         - those logs can be analyzed with an analysis tool
-        Dan: the logs will appear in the logs bucket after about an hour...so with delay...TODO See if logs were generated
+        Dan: the logs will appear in the logs bucket after about an hour...so with delay...
 
     S3 Replication
         - 2 types, CRR (cross regional replication) and SRR (same region replication)
@@ -569,6 +569,86 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
         - scaling is automated !!!!
         - it is event-driven meaning that functions get called by AWS when needed.
 
+    Amazon API Gateway
+        - think of the example where you want to build a serverless API...a browser client makes REST calls...but these
+        calls can't target Lambda directly...so they pass through the API Gateway, which in turn can call Lambda..which
+        in turn can call Dynamo DB for example..
+        - so API Gateway allows developers to easily create, publish, maintain, monitor and secure APIs
+
+        Dan: see "10-1 API gateway usage.png"
+
+    AWS Batch
+        - a batch job is a job that has a start and end time
+        - batch will dynamically launch EC2 instances or Spot instances
+        - batch jobs run as Docker images
+
+    Amazon Lightsail
+        - it is a simpler alternative to using EC2, RDS, ELB, EBS, Route 53
+        - great for people with little cloud experience...but it doesn't offer the full configurations available when you
+        configure each of those services mentioned above for your app..
+
+
+==============================================================================================================
+11 Deployments & Managing Infrastructure at Scale
+
+    Cloud Formation
+        - is a declarative way (uses yaml or JSON format) of outlining your AWS infrastructure, for any resources
+        - benefits of cloud formation:
+            - infrastructure as code ...this means that you will not need to create resources manually from the WEB UI
+            console; any modifications in the infrastructure can be reviewed through code review
+            - costs : you get a resource identifier for each resource, so you can then easily track how much that resource
+            costs you; also you can estimate the costs of your resources with CloudFormation template; also because Cloud
+            Formation makes it easy to create AWS resources/services/instances, you can have costs saving...for example you can
+            clean all the resources from AWS at 5pm, when developers leave work, and recreate them in morning at 8 AM
+            automatically when the devs start working again
+            - you don't need to reinvent the wheel...you can use existing Cloud Formation templates found online
+            - you can generate diagrams of the resources used out of the template
+        - in the web console there is an Application Composer, a web UI tool that one can use to create the diagram of
+        the cloud, and generate the Cloud Formation configuration in either yaml or JSON
+
+    Amazon Cloud Development Kit (CDK)
+        - ALLOWS you to define the infrastructure using a programming language like Java
+        - the code will eventually be translated into a Cloud Formation json/yaml file
+
+    AWS Elastic Beanstalk
+        - a developer centric view of deploying an application on AWS
+        - THIS is a Platform as a Service (PaaS)
+        - so you provide the jar/war , make some UI configs, and then the app is stated
+
+    AWS Code deploy
+        - a way to deploy code automatically
+        - works with multiple EC2 instances, and with on premises servers (so AWS Code deploy is a hybrid service)
+
+    AWS Code commit
+        - is Amazons answer to GitHub ..
+        - source control service that hosts git based repositories
+
+    AWS Code build
+        - builds code in cloud...compiles code, runs tests, creates packages
+        - you only pay for build time...and it is fully managed, serverless
+
+    AWS Code pipeline
+        - orchestrate different steps needed to have code automatically pushed into production
+        - code goes from Code Commit -> Code Build -> Code deploy -> Elastic Beanstalk
+
+    AWS Code artifact
+        - some sort of repository where artifacts can be stored (like Artifactory )
+
+    AWS Code star
+        - AWS CodeStar enables you to quickly develop, build, and deploy applications on AWS. AWS CodeStar provides
+        a unified user interface, enabling you to easily manage your software development activities in one place.
+        With AWS CodeStar, you can set up your entire continuous delivery toolchain in minutes, allowing you to start
+        releasing code faster.
+
+    AWS Cloud9
+        - is a cloud IDE that you can use to edit run debug code in the cloud
+
+    AWS systems manager (SSM)
+        - get operational insights about your infrastructure
+        - rum commands across your fleet of servers
+        - store parameter configuration with the SSM Parameter store
+        - and many other managing functionalities
+
     TODO Continue from 120 API Gateway Overview
 
 
@@ -581,6 +661,11 @@ xx
 TODO Whenever you run into a problem with the course, maybe you can try and look over the videos of this other course:
     https://www.youtube.com/watch?v=bO25vbkoJlA&list=PL7iMyoQPMtAN4xl6oWzafqJebfay7K8KP
 
+TODO AWS Certified Cloud Practitioner Certification Course (CLF-C02) - Pass the Exam!
+    https://www.youtube.com/watch?v=NhDYbskXRgc&pp=ygUNYXdzIGxpZ2h0c2FpbA%3D%3D
+
+TODO  Playlist about various AWS services
+    https://www.youtube.com/watch?v=W6jQmVi31Xk&list=PLwyXYwu8kL0wg9R_VMeXy0JiK5_c70IrV
 
 !!!  Dan: very good explanation of network settings needed in AWS. This fixed my issues with connecting to the EC2 inbound
         and outboud
