@@ -432,7 +432,151 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
     AWS storage gateway
         - is a bridge between on premise data and cloud data in S3
 
-TODO Continu with 09 Databases & Analytics
+
+==============================================================================================================
+09 Databases & Analytics
+
+    - If you want to structure data you will need a database
+    - you can define relationships between datasets
+    - various types of DBs
+        - Relational Databases
+        - NoSQL
+            - NOT relational DBs
+            - flexible schema..easier to evolve data model...data can be nested, support for arrays (think of a JSON document
+            DB)
+            - you can do horizontal scaling
+            - examples : key-value DBs, document, graph, in memory
+
+    - sure you can run a DB yourself on an EC2 instance, but in that case you need to manually handle things like resiliency,
+    backups, patching, high availability, scaling, fault tolerance etc
+    - in this chapter we go through all DBs offered by Amazon
+
+    RDS ( Relational Database Service )
+        - allows creation of DBs in the cloud that will be managed by AWS
+        - various types of DBs: Postgres, MySql, Maria DB, Oracle, MS SQL server, Aurora (proprietary of AWS..not open sourced)
+        - we have the possibility to add read replicas for our DB for improving the read performance
+        - you can't SSH into your DB instance :(
+
+        - Aurora is a cloud optimized DB and claims 5x performance improvement over MySQL running on RDS, and over 3x performance
+        over Postgres running on RDS
+            (Using Aurora locks you into the AWS ecosystem, making it harder to migrate to another cloud provider if needed.)
+        - Aurora is not in the free tier...
+
+    Amazon ElastiCache
+        - ElastiCache is used to get a managed Redis or Memcached
+        - caches are in memory DBs with high performance and low latency
+        - this helps reduce load off databases for read intense workloads
+
+    Dynamo DB
+        - highly available DB with replication across 3 availability zones
+        - it is a NoSql DB...a key value database
+        - SCALES to massive workloads, and it is a serverless database
+            (In essence, serverless databases offer a convenient and scalable way to manage your application's data
+            without worrying about server infrastructure.)
+        - in the hands on example you will see that you do not create a server/instance ...just a table ...
+        - low latency retrieval
+
+        - Dynamo DB Accelerator - aka DAX - is a fully managed in memory cache for DynamoDB... DAX offeres a 10x improvement
+        when accessing data; difference between DAX and ElastiCache is that DAX is only for DynamoDB, while ElastiCache can
+        be used for other DBs
+
+    Redshift
+        - based on PostgreSql, but it is not used for OLTP (online transaction processing)...this is what RDS is good for,
+         but it is good for OLAP (online analytical and processing),...so good for using data warehousing and generating
+         reports etc
+        - data is loaded into it every hour, not every second
+        - it has a feature called MPP (masively parallel query execution) which is used to perform the reporting computations
+        very quickly
+
+    Amazon EMR (elastic map reduce)
+        - it is used to create Hadoop clusters (Big Data) to analyze and process large amounts of data
+        - the clusters can be made of hundreds of EC2 instances
+        - EMR takes care of provisioning and configuring all those EC2 instances to work together
+
+    Amazon Athena
+        - serverless query service to perform analytics against S3 objects
+        - use standard SQL language to query the files
+
+    Amazon QuickSight
+        - serverless machine learning powered business intelligence service to create interactive dashboards
+        - in order words, a tool for creating a dashboard over your data, that you can use to get insights into what is
+        happening in your app
+        - it is integrated with RDS, Aurora, Athena, Redshift, S3..
+
+    Document DB
+        - DocumentDB is the AWS implementation for MongoDB, just like Aurora is for the MySql/Postgres, which are relational
+        DBs
+        - so it is a NoSQL db
+        - so it is compatible with MongoDB, which is used to store, query and index JSON data
+        - similarly with Aurora, it is fully managed, highly available with replication over 3 availability zones
+
+    Amazon Neptune
+        - this is a graph DB
+
+    Amazon QLDB
+        - quantum ledger DB
+        - a ledger is a book recording of financial transactions
+        - fully managed, serverless, highly available, replication across 3 AZ
+        - USED to review history of all the changes made to your application data over time
+        - no entry can be removed or modified...data is cryptographically verifiable !!!!
+        - although it sounds familiar to blockchain, this has a central authority component where data is stored ...so
+        QLDB does not have descentralization
+
+    Amazon Managed Blockchain
+        - allows to build applications where multiple parties can execute transactions, without the need for a trusted,
+        central authority...so it is descentralized
+        - at the time of this course, this was compatible with the frameworks ethereum and hyperledger fabric
+
+    DMS
+        - database migration service
+        - so this runs on a EC2 instance, and takes data from a source database and writes data to a target database
+        - it supports homogeneous migrations, meaning from Oracle DB to Oracle DB
+        - also supports heterogeneous migrations, for ex from MS Sql Server to Aurora
+
+    AWS Glue
+        - is a extract transform and load (ETL) service
+
+
+==============================================================================================================
+10 Other Compute Services_ ECS, Lambda, Batch, Lightsail
+
+    ECS
+        - Elastic Container Service
+        - this is used to launch docker containers on AWS
+        - you need to provision and maintain the infrastructure (the EC2 instances)
+
+    Fargate
+        - also used to launch docker containers on AWS
+        - the difference from ECS is that with Fargate you do not need to provision the infrastructure...no EC2 instances to
+        manage
+        - AWS just runs the containers with the RAM and CPU that you need
+
+    ECR
+        - Elastic Container Registry
+        - this is a private docker registry on AWS
+        - this is where you need to store the AWS images in order to be able to run them on ECS or Fargate
+
+    Serverless
+        - means a new paradigm in which developers don't need to manage servers anymore...they just deploy the code
+        - it was pioneered by AWS lambda, but now includes anything that is managed ...databases, messaging, storage..
+        - it doesn't mean that there are no servers...it just means that developers don't need to manage / see the servers
+        - examples : AWS S3, DynamoDB, Fargate...Lambda
+
+    Lambda
+        - so ...we talked about EC2...which is limited by RAM and CPU and runs continuously, even though we do not need
+        it all the time
+        - with Lambda, we just have virtual functions...that are limited by time...and they run on demand
+        - scaling is automated !!!!
+        - it is event-driven meaning that functions get called by AWS when needed.
+
+    TODO Continue from 120 API Gateway Overview
+
+
+
+
+==============================================================================================================
+xx
+
 
 TODO Whenever you run into a problem with the course, maybe you can try and look over the videos of this other course:
     https://www.youtube.com/watch?v=bO25vbkoJlA&list=PL7iMyoQPMtAN4xl6oWzafqJebfay7K8KP
