@@ -645,13 +645,58 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
     AWS systems manager (SSM)
         - get operational insights about your infrastructure
-        - rum commands across your fleet of servers
+        - run commands across your fleet of servers
         - store parameter configuration with the SSM Parameter store
         - and many other managing functionalities
 
-    TODO Continue from 120 API Gateway Overview
 
+==============================================================================================================
+12. Leveraging the AWS Global Infrastructure
 
+    AWS Route 53
+        - managed DNS ...a DNS is like a phone book, a collection of rules and records which help clients understand
+        how to reach a server through URLs
+
+            Dan: see "12-1 how a DNS works at a high level.png"
+
+        - for exam you need to know the high level Routing policies:
+            - simple routing policy: no healt checks ..browser calls Route 53 to get the IP...
+            - weighted routing policy : Route 53 needs to select from several EC2 instances, and each of these has a different
+                weight.. 70% 20% 10%..and this means that clients will be calling 70% of the time the first EC2 instance,
+                20% the second one etc  (some kind of load balancing)
+            - latency routing policy: if your app is distributed globally, and you have EC2 instances in California and
+                Australia, and users all around the world, this policy will look at where the user is, and if he is close to
+                California he will be redirected to those EC2s ...based on latency
+            - failover routing policy: here Route 53 performs a health check on the EC2, which if it fails, it will redirect
+                calls to another healthier EC2 instance
+
+        - YOU HAVE the possibility to Register domains inside AWS Route 53
+!!!!!   - 144 Route 53 Hands On.mp4
+                Dan: very good tutorial of starting 2 EC2 instances in different regions, and registering them in Route 53
+                    and by using a domain name, users get directed to the best EC2 instance
+                    He used a vpn to simulate the fact that he is in another region of the world, so that the EC2 instance
+                    closer to that region was serving requests.
+
+    AWS Cloudfront
+        - is a CDN
+        - improves read performance as content is cached at edge
+        - it offers DDOS protection , AWS Web App Firewall
+        - it can cache from S3 buckets, Custom origin (HTTP) ..application load balancer, EC2 instance, or any http backend
+        - great for static content that must be available everywhere
+
+    AWS Global Accelerator
+        - improves availability and performance by using the AWS global network
+        - this works by having users connect to Edge locations, and then redirected to the resource through the AWS network
+        - difference between this and CLoudfront is that CloudFront provides caching, while the Global Accelerator just
+        passes the information through the AWS network for faster response times
+
+    AWS Wavelength
+        - bring AWS services to the edge of 5g networks..in order to provide low latency through the use of 5G networks
+
+==============================================================================================================
+13 Cloud Integrations
+
+    TODO Continue from here
 
 
 ==============================================================================================================
